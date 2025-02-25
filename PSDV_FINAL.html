@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exposition Assignment</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Exposition Assignment: [VegaLite]</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#setup">Installation & Setup</a></li>
+            <li><a href="#features">Key Features</a></li>
+            
+            <li><a href="#usecases">Use Cases</a></li>
+            <li><a href="#conclusion">Conclusion</a></li>
+            <li><a href="#references">References</a></li>
+        </ul>
+    </nav>
+    <section id="introduction">
+        <h2>Introduction</h2>
+        <p>Vega-Lite is a declarative visualization library that provides an easy-to-use, high-level API for producing interactive and expressive data visualizations
+             from simple JSON code. In contrast to conventional coding libraries where one has to provide step-by-step instructions on how to plot every element, Vega-Lite takes a declarative method, where one indicates what should be displayed and not how to display it. This is a much simpler way of making sophisticated visualizations such as bar charts, line graphs, scatter plots, and others.</p> It does all the work related to scales, axes, and legends automatically, thereby lessening the effort involved in manual configuration. It also enables robust interactive capabilities, including tooltips, zooming, and filtering, to allow users to create interactive and dynamic charts. This blend of ease of use, flexibility, and interactivity makes Vega-Lite a great fit for data analysts, developers, and educators who wish to create effective data visualizations with a little effort  </p>
+    </section>
+    <section id="setup">
+        <h2>Installation & Setup</h2>
+        <p>Step-by-step guide to installing and configuring the tool.</p>
+        <p>To get started with Vega-Lite in Python, you will need to install Altair library.</p>
+        <p> 
+
+        </p>
+        <p>Installation:</p>
+        <p>Using pip:</p>
+        
+        <pre><code>pip install altair</code></pre>
+        <p>To access collection of example datasets to use with Vega-Lite, we have Python package named vega_datasets. To install it:  </p>
+        <p>Using pip:</p>
+        <pre><code>pip install vega_datasets</code></pre>
+
+    </section>
+    <section id="features">
+        <h2>Key Features and code examples</h2>
+        <p>1. Describe visualizations using a concise JSON syntax.
+         </p>
+        <p>2. Single-View and Multi-View Displays: Create simple charts and complex multi-view displays.</p>
+        <p>Example:</p>
+        <pre><code>
+            #Simple chart
+            import altair as alt  # Importing the Altair library
+            import pandas as pd  # Importing the Pandas library
+
+            # Creating a DataFrame with sample data
+            source = pd.DataFrame({
+                'a': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],  # Categories for the x-axis
+                'b': [28, 55, 43, 91, 81, 53, 19, 87, 52]  # Values for the y-axis
+            })
+
+            # Creating a bar chart using Altair
+            chart = alt.Chart(source).mark_bar().encode(
+                x='a',  # Setting the x-axis to the 'a' column
+                y='b'   # Setting the y-axis to the 'b' column
+            )
+
+            # Displaying the chart
+            chart.show()
+</code></pre>
+        <pre><code>
+            #Complex multi-view display
+            
+            import altair as alt  # Importing the Altair library
+
+            from vega_datasets import data  # Importing the Vega Datasets library
+            
+            # Loading the cars dataset from Vega Datasets
+            source = data.cars()
+            
+            # Creating a multi-view scatter plot using Altair
+            chart = alt.Chart(source).mark_circle().encode(
+                alt.X(alt.repeat("column"), type='quantitative'),  # Setting the x-axis to be dynamic based on the repeated columns
+                alt.Y(alt.repeat("row"), type='quantitative'),  # Setting the y-axis to be dynamic based on the repeated rows
+                color='Origin:N'  # Coloring the points based on the 'Origin' column (nominal data)
+            ).properties(
+                width=150,  # Setting the width of each plot
+                height=150  # Setting the height of each plot
+            ).repeat(
+                row=['Horsepower', 'Acceleration', 'Miles_per_Gallon'],  # Repeating plots for each value in the row list
+                column=['Miles_per_Gallon', 'Acceleration', 'Horsepower']  # Repeating plots for each value in the column list
+            ).interactive()  # Making the plots interactive (e.g., for zooming and panning)
+            
+            # Displaying the multi-view scatter plot chart
+            chart.show()
+            </code></pre>
+        <p>3. Interactive Visualizations: Add interactivity like panning, zooming, and brushing.</p>
+        <p>Example:</p>
+        <pre><code>
+            import altair as alt  # Importing the Altair library
+            from vega_datasets import data  # Importing the Vega Datasets library
+
+            # Loading the unemployment across industries dataset from Vega Datasets
+            source = data.unemployment_across_industries.url
+
+            # Creating a selection that binds to the legend and allows for interaction
+            selection = alt.selection_point(fields=['series'], bind='legend')
+
+            # Creating an area chart using Altair
+            chart = alt.Chart(source).mark_area().encode(
+                alt.X('yearmonth(date):T', axis=alt.Axis(domain=False, format='%Y', tickSize=0)),  # Formatting the x-axis to display year and month
+                alt.Y('sum(count):Q', stack='center', axis=None),  # Summing the 'count' values and stacking them in the center
+                alt.Color('series:N', scale=alt.Scale(scheme='category20b')),  # Coloring the areas based on the 'series' column using a specified color scheme
+                opacity=alt.when(selection).then(alt.value(1)).otherwise(alt.value(0.2))  # Setting opacity based on the selection, with selected series having full opacity
+            ).add_params(
+                selection  # Adding the selection to the chart
+            )
+
+            # Displaying the area chart
+            chart.show()
+</code></pre>
+        <p>4. Data Transformations: Perform filtering, aggregation, binning, and calculations within the visualization.</p>
+        <p>Example:</p>
+        <pre><code>
+            import altair as alt  # Importing the Altair library
+            import pandas as pd  # Importing the Pandas library
+            from vega_datasets import data  # Importing the Vega Datasets library
+
+            # Loading the cars dataset from Vega Datasets
+            source = data.cars()
+            print(source)  # Printing the source data (optional, for debugging purposes)
+
+            # Filtering the data to include only cars with Horsepower greater than 100
+            filtered_data = source[source['Horsepower'] > 100]
+
+            # Creating a histogram using Altair
+            chart = alt.Chart(filtered_data).mark_bar().encode(
+                alt.X('Miles_per_Gallon:Q', bin=alt.Bin(maxbins=20)),  # Binning the 'Miles_per_Gallon' values into 20 bins
+                alt.Y('count()', title='Number of Cars'),  # Counting the number of cars in each bin
+                alt.Color('Origin:N')  # Coloring the bars based on the 'Origin' column (nominal data)
+            ).properties(
+                width=600,  # Setting the width of the chart
+                height=400,  # Setting the height of the chart
+                title='Histogram of Miles per Gallon (Filtered for Horsepower > 100)'  # Setting the title of the chart
+            )
+
+            # Displaying the histogram
+            chart.show()
+</code></pre>
+        <p>5. Can use to layer multiple charts. </p>
+        <p>Example: Line chart and point chart layered over each other</p>
+        <pre><code>
+            import altair as alt  # Importing the Altair library
+            from vega_datasets import data  # Importing the Vega Datasets library
+            
+            # Loading the stocks dataset from Vega Datasets
+            source = data.stocks()
+            
+            # Filtering the data to include only the rows where the symbol is 'GOOG' (Google)
+            filtered_data = source[source['symbol'] == 'GOOG']
+            
+            # Creating a line chart of the filtered data using Altair
+            line_chart = alt.Chart(filtered_data).mark_line().encode(
+                x='date:T',  # Encoding the x-axis with dates (temporal data type)
+                y='price:Q',  # Encoding the y-axis with stock prices (quantitative data type)
+                color=alt.value('blue')  # Setting the line color to blue
+            )
+            
+            # Creating a point chart of the filtered data using Altair
+            point_chart = alt.Chart(filtered_data).mark_point().encode(
+                x='date:T',  # Encoding the x-axis with dates (temporal data type)
+                y='price:Q',  # Encoding the y-axis with stock prices (quantitative data type)
+                color=alt.value('red')  # Setting the point color to red
+            )
+            
+            # Layering the line chart and point chart together
+            layered_chart = alt.layer(line_chart, point_chart).properties(
+                width=600,  # Setting the width of the chart
+                height=400,  # Setting the height of the chart
+                title='Layered Chart: Google Stock Prices'  # Setting the title of the chart
+            )
+            
+            # Displaying the layered chart
+            layered_chart.show()
+            
+            </code></pre>
+        <p>6. Responsive Design: Visualizations adapt to different screen sizes and resolutions.
+
+            </p>
+        <p>Example: Responsive chart that adjusts its width based on containers size</p>
+        <pre><code>
+            import altair as alt  # Importing the Altair library
+            from vega_datasets import data  # Importing the Vega Datasets library
+            
+            # Loading the movies dataset from Vega Datasets
+            source = data.movies()
+            
+            # Creating a bar chart using Altair
+            chart = alt.Chart(source).mark_bar().encode(
+                x=alt.X('IMDB_Rating:Q', bin=alt.Bin(maxbins=10), title='IMDB Rating'),  # Binning the 'IMDB_Rating' values into 10 bins and setting the x-axis title
+                y=alt.Y('count()', title='Number of Movies'),  # Counting the number of movies in each bin and setting the y-axis title
+                color='Major_Genre:N'  # Coloring the bars based on the 'Major_Genre' column (nominal data)
+            ).properties(
+                width='container',  # Setting the chart width to be responsive
+                height=400,  # Setting the chart height
+                title='Responsive Bar Chart: IMDB Ratings by Genre'  # Setting the chart title
+            ).configure_view(
+                strokeWidth=0  # Removing the default chart border
+            )
+            
+            # Displaying the bar chart
+            chart.show()
+            
+            </code></pre>
+        <p>7. Customizable Components: Customize scales, axes, legends, and marks.</p>
+        <p>Example: Demonstartes how to customize axes, scales, marks and legends in a chart</p>
+        <pre><code>
+            import altair as alt  # Importing the Altair library
+            from vega_datasets import data  # Importing the Vega Datasets library
+            
+            # Loading the cars dataset from Vega Datasets
+            source = data.cars()
+            
+            # Creating a scatter plot using Altair with customized point sizes and opacity
+            chart = alt.Chart(source).mark_point(size=100, opacity=0.8).encode(
+                x=alt.X('Horsepower:Q', scale=alt.Scale(domain=[50, 250]), title='Horsepower'),  # Setting the x-axis to 'Horsepower' with a specified domain and axis title
+                y=alt.Y('Miles_per_Gallon:Q', scale=alt.Scale(domain=[10, 50]), title='Miles per Gallon'),  # Setting the y-axis to 'Miles_per_Gallon' with a specified domain and axis title
+                color=alt.Color('Origin:N', legend=alt.Legend(title='Car Origin')),  # Coloring the points based on 'Origin' with a legend title
+                tooltip=['Name', 'Horsepower', 'Miles_per_Gallon']  # Adding tooltips to display the car name, horsepower, and miles per gallon
+            ).properties(
+                width=600,  # Setting the chart width
+                height=400,  # Setting the chart height
+                title='Customized Scatter Plot: Horsepower vs. Miles per Gallon'  # Setting the chart title
+            ).configure_axis(
+                grid=True,  # Enabling grid lines for the axes
+                gridColor='lightgray',  # Setting the grid line color
+                labelFontSize=12,  # Setting the font size for axis labels
+                titleFontSize=14  # Setting the font size for axis titles
+            ).configure_legend(
+                titleFontSize=14,  # Setting the font size for legend title
+                labelFontSize=12  # Setting the font size for legend
+            )
+
+            # Displaying the scatter plot
+            chart.show() </code></pre>
+    
+    </section>
+    <section id="usecases">
+        <h2>Use Cases</h2>
+        <p>Discuss practical applications of the tool.</p>
+        <pre><code>
+            import pandas as pd
+            import altair as alt
+            
+            
+            file_path = r"C:\Users\MAYANK\Downloads\owid-covid-data.csv"
+            data = pd.read_csv(file_path, parse_dates=["date"])
+            
+            
+            data = data[data["location"] == "India"]
+            
+            
+            data = data[data["date"] > "2023-08-01"]
+            
+            
+            data = data[["date", "new_cases", "new_deaths"]]
+            
+            
+            data = data.iloc[:5000]  
+            
+            
+            heatmap = alt.Chart(data).mark_rect().encode(
+                x=alt.X("date:T", title="Date"),  
+                y=alt.Y("new_cases:Q", title="New Cases", bin=alt.Bin(maxbins=50)),  
+                color=alt.Color("new_cases:Q", scale=alt.Scale(scheme="reds"), title="Cases"),  
+                tooltip=["date", "new_cases", "new_deaths"]  
+            ).properties(
+                title="COVID-19 Case Heatmap - India",
+                width=700,
+                height=400
+            ).interactive()  
+            
+            heatmap.show()</code></pre>
+        <img src="uses_cases.png">
+    </section>
+    <section id="conclusion">
+        <h2>Conclusion</h2>
+        <p>In concluding, Vega-Lite is a powerful tool that makes the generation of interactive data visualizations easy. With an intuitive JSON syntax, it allows for simple creation of graphics using a declarative approach. The greatest strengths of Vega-Lite are its simplicity, automatic management of scales and legends, and built-in interactivity: tooltips, and zooming. Vega-Lite is also extensible and comes with support for various chart types and powerful data transformations. Potentially use cases like the analysis of dashboards, interactive reports, tools for teaching, and any application requiring dynamic data visualization are all at the fingertips of Vega-Lite. These features make Vega-Lite a great fit for developers, analysts, and educators wishing to communicate the insights found in data. </p>
+
+    </section>
+    <section id="references">
+        <h2>References & Further Reading</h2>
+        <ul>
+            <li><a href="https://pandas.pydata.org/docs/" target="_blank"> Pandas Documentation – For data manipulation and preprocessing.</a></li>
+                
+            <li><a href="https://altair-viz.github.io/" target = "_blank">	Altair Documentation – For interactive data visualizations.</a></li>
+            <li><a href="https://ourworldindata.org/coronavirus-source-data" target = "_blank">	Our World in Data - COVID-19 Dataset – The dataset source.</a></li>
+            
+            <li><a href="https://jakevdp.github.io/PythonDataScienceHandbook/" target = "_blank">	Python Data Science Handbook – A great resource for data analysis techniques.</a></li>
+                   
+        </ul>
+    </section>
+    <footer>
+        <p>&copy; 2025 Exposition Assignment</p>
+    </footer>
+</body>
+</html>
